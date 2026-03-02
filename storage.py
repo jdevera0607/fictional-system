@@ -1,27 +1,32 @@
 import os
 import json
 
-FILE_PATH = "data/tickets.json"
-def initialize_storage():
-    if not os.path.exists("data"):
-            os.mkdir("data")
-            print("folder does not exist, creating data folder")
-    if not os.path.exists(FILE_PATH):
-            with open(FILE_PATH, 'w') as f:
-                json.dump([], f)
+class Storage:
+    def __init__(self, file_path):
+         self.file_path = file_path
 
-def load_tickets():
-    try:
-        with open(FILE_PATH, "r") as f:
-             return json.load(f)
-    except json.JSONDecodeError:
-         print("Error: Corrupted JSON file")
-    except FileNotFoundError:
-        print("Error: file not found")
-        return []
-    
-def save_tickets(tickets):
-     with open(FILE_PATH, "w") as f:
-          json.dump(tickets, f, indent=4)
-            
-            
+    def initialize_storage(self):
+        directory = os.path.dirname(self.file_path)
+
+        if not os.path.exists(directory):
+                os.makedirs(directory, exist_ok=True)
+
+        if not os.path.exists(self.file_path):
+                with open(self.file_path, 'w') as f:
+                    json.dump([], f)
+
+    def load_tickets(self):
+        try:
+            with open(self.file_path, "r") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            raise Exception("JSON is corrupted")
+
+        except FileNotFoundError:
+            raise Exception("File not found")
+        
+    def save_tickets(self, tickets):
+        with open(self.file_path, "w") as f:
+            json.dump(tickets, f, indent=4)
+                
+storage = Storage("data/tickets.json")
